@@ -1,0 +1,42 @@
+<?php
+
+namespace backend\admin\features\noPermission;
+
+use backend\admin\NoPermission;
+use backend\Configs;
+use backend\exceptions\CriticalException;
+use backend\fileSystem\PathsFS;
+use backend\Permission;
+
+class GetPermissions extends NoPermission {
+
+	function exec(): array {
+		if(!Configs::getDataStore()->isReady()) {
+			throw new CriticalException('Server is not ready.');
+		}
+		if (!Permission::isLoggedIn())
+			return ['isLoggedIn' => false];
+		else {
+			if (Permission::isAdmin()) {
+				$obj = [
+					'isAdmin' => true,
+					'canCreate' => true,
+					'canIssueFallbackTokens' => true,
+					'hasErrors' => Configs::getDataStore()->getErrorReportStore()->hasErrorReports(),
+					'totalDiskSpace' => disk_total_space(PathsFS::folderData()),
+					'freeDiskSpace' => disk_free_space(PathsFS::folderData()),
+				];
+			} else
+				$obj = [
+					'permissions' => Permission::getPermissions(),
+					'canCreate' => Permission::canCreate(),
+					'canIssueFallbackTokens' => Permission::canIssueFallbackTokens()
+				];
+			$obj['accountName'] = Permission::getAccountName();
+			$obj['isLoggedIn'] = true;
+			$obj['newMessages'] = Configs::getDataStore()->getMessagesStore()->getStudiesWithUnreadMessagesForPermission();
+			$obj['newMerlinLogs'] = Configs::getDataStore()->getMerlinLogsStore()->getStudiesWithUnreadMerlinLogsForPermission();
+			return $obj;
+		}
+	}
+}
