@@ -1,19 +1,19 @@
 <?php
 
-namespace backend\admin\features\readPermission;
+namespace backend\admin\features\noPermission;
 
-use backend\admin\HasReadPermission;
+use backend\admin\NoPermission;
 use backend\Configs;
 use backend\exceptions\PageFlowException;
 
-class DeleteMerlinLog extends HasReadPermission {
+class DataFolderExists extends NoPermission {
+	
 	function exec(): array {
-		if(!isset($_POST['timestamp']))
+		if(Configs::getDataStore()->isInit())
+			throw new PageFlowException('Disabled');
+		else if(!isset($_POST['data_location']))
 			throw new PageFlowException('Missing data');
 		
-		$timestamp = (int)$_POST['timestamp'];
-		
-		Configs::getDataStore()->getMerlinLogsStore()->removeMerlinLog($this->studyId, $timestamp);
-		return [];
+		return Configs::getDataStore()->getESMiraInitializer()->getInfoArray($_POST['data_location']);
 	}
 }

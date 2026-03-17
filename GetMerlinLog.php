@@ -6,29 +6,43 @@ use backend\admin\HasReadPermission;
 use backend\Configs;
 use backend\exceptions\CriticalException;
 use backend\exceptions\PageFlowException;
+use backend\Paths;
+use backend\SSE;
 
-class GetMedia extends HasReadPermission {
-	public function execAndOutput() {
-		if(!isset($_GET['userId']) || !isset($_GET['entryId']) || !isset($_GET['key']) || !isset($_GET['media_type']))
-			throw new PageFlowException('Missing data');
-		$userId = $_GET['userId'];
-		$entryId = (int) $_GET['entryId'];
-		$key = $_GET['key'];
-		
-		switch($_GET['media_type']) {
-			case 'image':
-				Configs::getDataStore()->getResponsesStore()->outputImageFromResponses($this->studyId, $userId, $entryId, $key);
-				break;
-			case 'audio':
-				Configs::getDataStore()->getResponsesStore()->outputAudioFromResponses($this->studyId, $userId, $entryId, $key);
-				break;
-			default:
-				throw new PageFlowException('Faulty data');
-				break;
+class CreateMediaZip extends HasReadPermission {
+	/**
+	 * @var SSE
+	 */
+	private $sse;
+	
+	/**
+	 * Constructor is only needed for testing.
+	 * @param SSE|null $sse SSE object to use for sending progress updates.
+	 * @throws CriticalException
+	 * @throws PageFlowException
+	 */
+	public function __construct(?SSE $sse = null) {
+		parent::__construct();
+		$this->sse = $sse ?? new SSE();
+	}
+	
+	function execAndOutput() {
+		$this->sse->sendHeader();
+
+		$pathZip = Paths::fileMediaZip($this->studyId);
+		if(!file_exists($pathZip)) {//zip was not created or deleted, so we create it:
+			Configs::getDataStore()->getResponsesStore()->createMediaZip(
+				$this->studyId,
+				function(int $step, int $total) {
+					$this->sse->flushProgress(1, 1, $step, $total);
+				}
+			);
 		}
+		
+		$this->sse->flushFinished();
 	}
 	
 	function exec(): array {
-		throw new CriticalException('Internal error. GetMediaImage can only be used with execAndOutput()');
+		throw new CriticalException('Internal error. CreateMediaZip can only be used with execAndOutput()');
 	}
 }

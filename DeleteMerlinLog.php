@@ -5,9 +5,8 @@ namespace backend\admin\features\readPermission;
 use backend\admin\HasReadPermission;
 use backend\Configs;
 
-class ListData extends HasReadPermission {
-	
-	function exec(): array {
-		return Configs::getDataStore()->getResponsesStore()->getResponseFilesList($this->studyId);
-	}
+class ListMerlinLogs extends HasReadPermission {
+    function exec(): array {
+        return Configs::getDataStore()->getMerlinLogsStore()->getMerlinLogsList($this->studyId);
+    }
 }

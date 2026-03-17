@@ -1,24 +1,20 @@
 <?php
 
-namespace backend\admin\features\loggedIn;
+namespace backend\admin\features\readPermission;
 
-use backend\admin\features\loggedIn\GetTokenList;
-use backend\admin\IsLoggedIn;
+use backend\admin\HasReadPermission;
 use backend\Configs;
+use backend\exceptions\CriticalException;
 use backend\exceptions\PageFlowException;
-use backend\Permission;
 
-class RemoveToken extends IsLoggedIn {
+class GetData extends HasReadPermission {
+	public function execAndOutput() {
+		if(!isset($_GET['q_id']))
+			throw new PageFlowException('Missing data');
+		Configs::getDataStore()->getResponsesStore()->outputResponsesFile($this->studyId, $_GET['q_id']);
+	}
 	
 	function exec(): array {
-		if(!isset($_POST['token_id']))
-			throw new PageFlowException('Missing data');
-		
-		$accountName = Permission::getAccountName();
-		$tokenId = $_POST['token_id'];
-		Configs::getDataStore()->getLoginTokenStore()->removeLoginToken($accountName, $tokenId);
-		
-		$c = new GetTokenList();
-		return $c->exec();
+		throw new CriticalException('Internal error. GetData can only be used with execAndOutput()');
 	}
 }

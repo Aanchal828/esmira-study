@@ -2,21 +2,19 @@
 
 namespace backend\admin\features\loggedIn;
 
+use backend\admin\HasWritePermission;
 use backend\admin\IsLoggedIn;
-use backend\Main;
 use backend\Configs;
 use backend\exceptions\CriticalException;
-use backend\Permission;
+use backend\JsonOutput;
 
-class GetLoginHistory extends IsLoggedIn {
-	
+class GetFullStudy extends IsLoggedIn {
 	public function execAndOutput() {
-		$accountName = Permission::getAccountName();
-		Main::setHeader('Content-Type: text/csv');
-		echo Configs::getDataStore()->getAccountStore()->getLoginHistoryCsv($accountName);
+		$studyStore = Configs::getDataStore()->getStudyStore();
+		echo JsonOutput::successString('{"config": ' .$studyStore->getStudyConfigAsJson($this->studyId) .', "languages": ' .$studyStore->getAllLangConfigsAsJson($this->studyId) .'}');
 	}
 	
 	function exec(): array {
-		throw new CriticalException('Internal error. GetLoginHistory can only be used with execAndOutput()');
+		throw new CriticalException('Internal error. GetFullStudy can only be used with execAndOutput()');
 	}
 }
