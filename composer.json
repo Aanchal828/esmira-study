@@ -1,0 +1,7 @@
+{
+  "name": "esmira/esmira-web",
+  "description": "ESMira Web Server",
+  "require": {
+    "php": "^8.3"
+  }
+}
