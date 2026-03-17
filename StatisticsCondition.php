@@ -1,0 +1,54 @@
+<?php
+
+namespace backend\dataClasses;
+
+use backend\Main;
+
+class UserData {
+	/**
+	 * @var int
+	 */
+	public $joinedTime;
+	
+	/**
+	 * @var int
+	 */
+	public $lastDataSetTime = -1;
+	
+	/**
+	 * @var int
+	 */
+	public $userIdInteger;
+	
+	/**
+	 * @var string
+	 */
+	public $token;
+	
+	/**
+	 * @var int
+	 */
+	public $dataSetCount;
+	
+	public $group = 0;
+	public $appType = '';
+	public $appVersion = '';
+	
+	public $questionnaireDataSetCount = [];
+	
+	public $generatedRewardCode = false;
+
+	public $usedLanguages = [];
+	public $mostRecentLanguage = '';
+	
+	public function __construct(int $userIdInteger, int $token, int $dataSetCount, string $initialLanguage = null) {
+		$this->userIdInteger = $userIdInteger;
+		$this->token = $token;
+		$this->dataSetCount = $dataSetCount;
+		$this->joinedTime = Main::getMilliseconds();
+		if($initialLanguage !== null) {
+			$this->usedLanguages[] = $initialLanguage;
+			$this->mostRecentLanguage = $initialLanguage;
+		}
+	}
+}

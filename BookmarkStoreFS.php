@@ -6,16 +6,16 @@ use backend\Configs;
 use backend\exceptions\PageFlowException;
 use backend\fallback\FallbackFeature;
 
-class DeleteAllStudies extends FallbackFeature
+class DeleteStudy extends FallbackFeature
 {
 	function exec(): array
 	{
+		if (!isset($_POST['studyId']))
+			throw new PageFlowException('Missing data');
+		$studyId = $_POST['studyId'];
 		$store = Configs::getDataStore()->getFallbackStudyStore($this->encodedUrl);
-		$studyIdList = $store->getStudyIdList();
-		foreach ($studyIdList as $studyId) {
-			$store->delete($studyId);
-		}
+		$store->delete($studyId);
 
-		return [];
+		return [$studyId];
 	}
 }

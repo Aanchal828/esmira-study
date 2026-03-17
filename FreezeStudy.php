@@ -1,29 +1,20 @@
 <?php
 
-namespace backend\admin\features\adminPermission;
+namespace backend\fallback\features;
 
-use backend\admin\HasAdminPermission;
 use backend\Configs;
-use backend\exceptions\CriticalException;
-use backend\exceptions\FallbackRequestException;
-use backend\exceptions\PageFlowException;
-use backend\FallbackRequest;
+use backend\fallback\FallbackFeature;
 
-class PingFallbackServer extends HasAdminPermission
+class DeleteAllStudiesExcept extends FallbackFeature
 {
 	function exec(): array
 	{
-		if (!isset($_POST['url']))
-			throw new PageFlowException("Missing data");
-
-		$rawUrl = $_POST['url'];
-		$url = base64_decode($rawUrl);
-
-		$request = new FallbackRequest();
-		try {
-			$request->postRequest($url, "Ping", []);
-		} catch (FallbackRequestException $e) {
-			throw new CriticalException($e->getMessage());
+		$keepList = isset($_GET['studyList']) ? json_decode($_GET['studyList']) : [];
+		$store = Configs::getDataStore()->getFallbackStudyStore($this->encodedUrl);
+		$studyIdList = $store->getStudyIdList();
+		$deleteList = array_diff($studyIdList, $keepList);
+		foreach ($deleteList as $studyId) {
+			$store->delete($studyId);
 		}
 		return [];
 	}

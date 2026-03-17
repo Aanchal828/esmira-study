@@ -1,0 +1,370 @@
+<?php
+
+namespace backend\fileSystem;
+
+use backend\Main;
+use backend\Configs;
+use backend\exceptions\CriticalException;
+use backend\Paths;
+
+class PathsFS {
+	const FILENAME_DATA = 'esmira_data',
+		FILENAME_EVENTS = 'events',
+		FILENAME_PLUGIN_METADATA = 'metadata.json',
+		FILENAME_STATISTICS_JSONFILE = 'json',
+		FILENAME_STATISTICS_METADATA = '.metadata',
+		FILENAME_STATISTICS_NEWLINES = '.new_data',
+		FILENAME_STUDY_INDEX = '.index',
+		FILENAME_WEB_ACCESS = 'web_access',
+		FOLDER_PLUGIN_DATA = '.data';
+	
+	static function folderData(): string {
+		return Configs::get('dataFolder_path');
+	}
+	
+	static function folderErrorReports(): string {
+		return self::folderData() . 'errors/';
+	}
+	
+	static function folderLegal(): string {
+		return self::folderData() . 'legal/';
+	}
+	
+	static function folderStudies(): string {
+		return self::folderData() . 'studies/';
+	}
+	
+	static function folderTokenRoot(): string {
+		return self::folderData() . '.loginToken/';
+	}
+	static function folderSnapshots(): string {
+		return self::folderData() . 'snapshots/';
+	}
+	static function fileSnapshotZip(string $name): string {
+		return self::folderSnapshots() . Paths::makeUrlFriendly($name) . '.zip';
+	}
+	
+	static function fileDataVersion(): string {
+		return self::folderData() . Paths::FILENAME_VERSION;
+	}
+	
+	static function fileLogins(): string {
+		return self::folderData() . '.logins';
+	}
+	
+	static function filePermissions(): string {
+		return self::folderData() . '.permissions';
+	}
+	
+	static function fileServerStatistics(): string {
+		return self::folderData() . 'server_statistics.json';
+	}
+	
+	static function fileStudyIndex(): string {
+		return self::folderStudies() . self::FILENAME_STUDY_INDEX;
+	}
+	
+	static function fileFallbackStudyIndex(string $encodedUrl): string {
+		return self::folderFallbackStudiesUrl($encodedUrl) . self::FILENAME_STUDY_INDEX;
+	}
+	
+	
+	static function folderLangs(int $studyId): string {
+		return self::folderStudies() . "$studyId/.langs/";
+	}
+	
+	static function folderMedia(int $studyId): string {
+		return self::folderStudies() . "$studyId/media/";
+	}
+	
+	static function folderMerlinLogs(int $studyId): string {
+		return self::folderStudies() . "$studyId/.merlin_logs/";
+	}
+	
+	static function folderMessages(int $studyId): string {
+		return self::folderStudies() . "$studyId/.messages/";
+	}
+	
+	static function folderMessagesArchive(int $studyId): string {
+		return self::folderMessages($studyId) . '.archive/';
+	}
+	
+	static function folderMessagesPending(int $studyId): string {
+		return self::folderMessages($studyId) . '.pending/';
+	}
+	
+	static function folderMessagesUnread(int $studyId): string {
+		return self::folderMessages($studyId) . '.unread/';
+	}
+	
+	static function folderPendingUploads(int $studyId): string {
+		return self::folderMedia($studyId) . '.pending_uploads/';
+	}
+	
+	static function folderResponsesIndex(int $studyId): string {
+		return self::folderStudies() . "$studyId/.responses_index/";
+	}
+	
+	static function folderResponses(int $studyId): string {
+		return self::folderStudies() . "$studyId/responses/";
+	}
+	
+	static function folderStatistics(int $studyId): string {
+		return self::folderStudies() . "$studyId/.statistics/";
+	}
+	
+	static function folderStudy(int $studyId): string {
+		return self::folderStudies() . "$studyId/";
+	}
+	
+	static function folderToken(string $accountName): string {
+		return self::folderTokenRoot() . Paths::makeUrlFriendly($accountName) . '/';
+	}
+	
+	static function folderUserData(int $studyId): string {
+		return self::folderStudies() . "$studyId/.userdata/";
+	}
+	
+	static function folderRewardCodes(int $studyId): string {
+		return self::folderStudies() . "$studyId/.reward_codes/";
+	}
+	
+	static function folderFallbackStudies(): string {
+		return self::folderData() . 'fallbackStudies/';
+	}
+	
+	static function folderFallbackStudiesUrl(string $encodedUrl): string {
+		return self::folderFallbackStudies() . "$encodedUrl/";
+	}
+	
+	static function folderFallbackStudy(string $encodedUrl, int $studyId): string {
+		return self::folderFallbackStudiesUrl($encodedUrl) . "$studyId/";
+	}
+	
+	static function folderFallbackStudyLangs(string $encodedUrl, int $studyId): string {
+		return self::folderFallbackStudy($encodedUrl, $studyId) . '.langs/';
+	}
+	
+	static function folderPluginRoot(): string {
+		return self::folderData() . 'plugins/';
+	}
+	static function folderPluginTemp(): string {
+		return self::folderPluginRoot() . '.temp/';
+	}
+	static function folderPluginCache(): string {
+		return self::folderData() .".pluginCache/";
+	}
+	static function folderPlugin(string $pluginId): string {
+		return self::folderPluginRoot() .Paths::makeUrlFriendly($pluginId) .'/';
+	}
+	static function folderPluginFrontendSectionCodes(string $pluginId): string {
+		return self::folderPlugin($pluginId) . 'sections/';
+	}
+	static function folderPluginData(string $pluginId): string {
+		return self::folderPlugin($pluginId) .self::FOLDER_PLUGIN_DATA;
+	}
+	
+	static function folderPluginLanguages(string $pluginId): string {
+		return self::folderPlugin($pluginId) .'locales/';
+	}
+	
+	static function fileBlockLogin(string $accountName): string {
+		return self::folderToken($accountName) . '.blocking';
+	}
+	
+	static function fileErrorReport(int $timestamp): string {
+		return self::folderErrorReports() . $timestamp;
+	}
+	
+	static function fileErrorReportInfo(): string {
+		return self::folderErrorReports() . '.error_info';
+	}
+	
+	static function fileLangConfig(int $studyId, string $code): string {
+		return self::folderLangs($studyId) . "/$code.json";
+	}
+	
+	static function fileLangImpressum(string $code): string {
+		return $code === '_' ? self::folderLegal() . 'impressum.html' : self::folderLegal() . "impressum.$code.html";
+	}
+	
+	static function fileLangPrivacyPolicy(string $code): string {
+		return $code === '_' ? self::folderLegal() . 'privacy_policy.html' : self::folderLegal() . "privacy_policy.$code.html";
+	}
+	
+	static function fileLangHomeMessage(string $code): string {
+		return $code === '_' ? self::folderLegal() . 'home_message.html' : self::folderLegal() . "home_message.$code.html";
+	}
+	
+	static function fileLock(int $studyId): string {
+		return self::folderStudies() . "$studyId/.locked";
+	}
+	
+	static function fileMerlinLog(int $studyId, int $timestamp): string {
+		return self::folderMerlinLogs($studyId) . $timestamp;
+	}
+	
+	static function fileMerlinLogInfo(int $studyId): string {
+		return self::folderMerlinLogs($studyId) . '.merlin_logs_info';
+	}
+	
+	static function fileMessageArchive(int $studyId, string $userId): string {
+		return self::folderMessagesArchive($studyId) . Paths::makeUrlFriendly($userId);
+	}
+	
+	static function fileMessagePending(int $studyId, string $userId): string {
+		return self::folderMessagesPending($studyId) . Paths::makeUrlFriendly($userId);
+	}
+	
+	static function fileMessageUnread(int $studyId, string $userId): string {
+		return self::folderMessagesUnread($studyId) . Paths::makeUrlFriendly($userId);
+	}
+	
+	static function filePendingUploads(int $studyId, string $userId, int $identifier): string {
+		return self::folderPendingUploads($studyId) . Paths::makeUrlFriendly($userId) . '_' . $identifier;
+	}
+	
+	static function fileResponses(int $studyId, string $questionnaire_identifier): string {
+		switch($questionnaire_identifier) {
+			case self::FILENAME_EVENTS:
+				$filename = self::FILENAME_EVENTS;
+				break;
+			case self::FILENAME_WEB_ACCESS:
+				$filename = self::FILENAME_WEB_ACCESS;
+				break;
+			default:
+				if(Main::strictCheckInput($questionnaire_identifier))
+					$filename = $questionnaire_identifier;
+				else
+					$filename = 'error';
+				break;
+		}
+		return self::folderResponses($studyId) . "$filename.csv";
+	}
+	
+	/**
+	 * @throws CriticalException
+	 */
+	static function fileResponsesBackup(int $studyId, string $questionnaire_identifier): string {
+		$date = date('o-m-d');
+		$folder = self::folderResponses($studyId);
+		$filename = "{$date}_$questionnaire_identifier";
+		$file = $folder . "$filename.csv";
+		
+		
+		$count = 2;
+		while(file_exists($file)) {
+			$file = "$folder{$date}_{$count}_$questionnaire_identifier.csv";
+			if(++$count > Configs::get('max_possible_backups_per_day'))
+				throw new CriticalException('Could not rename old datafile. There are too many copies. Aborting... Check your datafiles before trying again.');
+		}
+		
+		return $file;
+	}
+	
+	static function fileResponsesIndex(int $studyId, string $questionnaire_identifier): string {
+		return self::folderResponsesIndex($studyId) . $questionnaire_identifier;
+	}
+	
+	static function fileStatisticsJson(int $studyId): string {
+		return self::folderStatistics($studyId) . self::FILENAME_STATISTICS_JSONFILE;
+	}
+	
+	static function fileStudyStatisticsMetadata(int $studyId): string {
+		return self::folderStatistics($studyId) . self::FILENAME_STATISTICS_METADATA;
+	}
+	
+	static function fileStatisticsNewData(int $studyId): string {
+		return self::folderStatistics($studyId) . self::FILENAME_STATISTICS_NEWLINES;
+	}
+	
+	static function fileStudyConfig(int $studyId): string {
+		return self::folderStudies() . "$studyId/.config.json";
+	}
+	
+	static function fileStudyMetadata(int $studyId): string {
+		return self::folderStudies() . "$studyId/.metadata";
+	}
+	
+	static function fileStudyCreateMetadata(int $studyId): string {
+		return self::folderStudies() . "$studyId/.create_metadata";
+	}
+	
+	static function fileToken(string $accountName, string $hash): string {
+		return self::folderToken($accountName) . $hash;
+	}
+	
+	static function fileTokenHistory(string $accountName, int $num): string {
+		return self::folderToken($accountName) . '.history' . $num;
+	}
+	
+	static function fileUserData(int $studyId, string $userId): string {
+		return self::folderUserData($studyId) . Paths::makeUrlFriendly($userId);
+	}
+	
+	static function fileRewardCode(int $studyId, string $code): string {
+		return self::folderRewardCodes($studyId) . Paths::makeUrlFriendly($code);
+	}
+	
+	static function fileBookmarks(): string {
+		return self::folderData() . '.bookmarks';
+	}
+	
+	static function fileIncomingFallbackTokens(): string {
+		return self::folderData() . '.inboundFallbackTokens';
+	}
+	
+	static function fileFallbackSetupTokens(): string {
+		return self::folderData() . '.fallbackSetupTokens';
+	}
+	
+	static function fileOutboundFallbackTokens(): string {
+		return self::folderData() . '.outboundFallbackTokens';
+	}
+	
+	static function fileFallbackStudyLock(string $encodedUrl, int $studyId): string {
+		return self::folderFallbackStudy($encodedUrl, $studyId) . '.locked';
+	}
+	
+	static function fileFallbackStudyConfig(string $encodedUrl, int $studyId): string {
+		return self::folderFallbackStudy($encodedUrl, $studyId) . '.config.json';
+	}
+	
+	static function fileFallbackLangConfig(string $encodedUrl, int $studyId, string $code): string {
+		return self::folderFallbackStudyLangs($encodedUrl, $studyId) . "$code.json";
+	}
+	
+	static function filePluginMetadata(string $pluginId, string $pluginPath = null): string {
+		return ($pluginPath ?? self::folderPlugin($pluginId)) . self::FILENAME_PLUGIN_METADATA;
+	}
+	static function filePluginStudyJsonInstructions(string $pluginId): string {
+		return self::folderPlugin($pluginId) . 'study.json';
+	}
+	static function filePluginIcon(string $pluginId): string {
+		return self::folderPlugin($pluginId) . 'icon.svg';
+	}
+	
+	static function filePluginLanguage(string $pluginId, string $code): string {
+		return self::folderPluginLanguages($pluginId) . Paths::makeSafe($code) .'.json';
+	}
+	
+	static function filePluginLanguageBundle(string $code): string {
+		return self::folderPluginCache() . "lang.$code.json";
+	}
+	
+	static function filePluginFrontendJson(): string {
+		return self::folderPluginCache() . 'frontend.json';
+	}
+	
+	static function filePluginFrontendSectionCode(string $pluginId, string $pageName): string {
+		return self::folderPluginFrontendSectionCodes($pluginId) . Paths::makeSafe($pageName) .'.js';
+	}
+	
+	static function filePluginApi(string $pluginId, string $apiName): string {
+		return self::folderPlugin($pluginId) . 'pluginApi/' . Paths::makeSafe($apiName) .'.php';
+	}
+	
+	static function filePluginApiExtension(string $pluginId, string $apiName): string {
+		return self::folderPlugin($pluginId) .'apiOverrides/' .Paths::makeSafe($apiName) .'.php';
+	}
+}
