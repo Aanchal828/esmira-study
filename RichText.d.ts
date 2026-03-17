@@ -1,0 +1,12 @@
+import { Vnode } from "mithril";
+export declare function BtnCustom(icon: Vnode<any, any>, onclick?: (e: MouseEvent) => void, title?: string, hoverTitle?: string): Vnode<any, any>;
+export declare function BtnRemove(onclick: () => void, title?: string): Vnode<any, any>;
+export declare function BtnTrash(onclick: () => void, title?: string): Vnode<any, any>;
+export declare function BtnAdd(onclick?: (e: MouseEvent) => void, title?: string, hoverTitle?: string): Vnode<any, any>;
+export declare function BtnCopy(onclick?: () => void, title?: string, hoverTitle?: string): Vnode<any, any>;
+export declare function BtnChange(onclick?: () => void, title?: string, hoverTitle?: string): Vnode<any, any>;
+export declare function BtnDownload(onclick?: () => void, title?: string, hoverTitle?: string): Vnode<any, any>;
+export declare function BtnEdit(onclick?: () => void, title?: string, hoverTitle?: string): Vnode<any, any>;
+export declare function BtnOk(onclick?: () => void, title?: string, hoverTitle?: string): Vnode<any, any>;
+export declare function BtnReload(onclick?: () => void, title?: string, hoverTitle?: string): Vnode<any, any>;
+export declare function BtnTransfer(onclick?: () => void, title?: string, hoverTitle?: string): Vnode<any, any>;
